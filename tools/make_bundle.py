@@ -47,6 +47,7 @@ def main():
         print(f"cloned into {builddir}")
         os.chdir("pytch-demos/demos")
         components = []
+        demos_with_error = []
         for entry in os.listdir("."):
             if any(fnmatch(entry, pattern) for pattern in EXCLUDE_PATTERNS):
                 print(f"skipping excluded {entry}")
@@ -56,6 +57,9 @@ def main():
                     subprocess.run(["cp", entry, dist_components_dir])
                     components.append(entry)
                 if os.path.isdir(entry):
+                    if not passes_black_check(Path(entry) / "dist/code/code.py"):
+                        demos_with_error.append(entry)
+
                     entry_zip = dist_components_dir / f"{entry}.zip"
                     try:
                         os.remove(entry_zip)
