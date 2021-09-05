@@ -7,7 +7,7 @@ from pathlib import Path
 from contextlib import contextmanager
 from fnmatch import fnmatch
 
-EXCLUDE_PATTERNS = ["README.md"]
+EXCLUDE_PATTERNS = ["README.md", "pyproject.toml"]
 
 
 @contextmanager
@@ -18,6 +18,11 @@ def workingdir(path):
         yield
     finally:
         os.chdir(cwd)
+
+
+def passes_black_check(path):
+    result = subprocess.run(["black", "--check", "--quiet", path])
+    return result.returncode == 0
 
 
 @click.command()
@@ -42,6 +47,7 @@ def main():
         print(f"cloned into {builddir}")
         os.chdir("pytch-demos/demos")
         components = []
+        demos_with_error = []
         for entry in os.listdir("."):
             if any(fnmatch(entry, pattern) for pattern in EXCLUDE_PATTERNS):
                 print(f"skipping excluded {entry}")
@@ -51,6 +57,9 @@ def main():
                     subprocess.run(["cp", entry, dist_components_dir])
                     components.append(entry)
                 if os.path.isdir(entry):
+                    if not passes_black_check(Path(entry) / "dist/code/code.py"):
+                        demos_with_error.append(entry)
+
                     entry_zip = dist_components_dir / f"{entry}.zip"
                     try:
                         os.remove(entry_zip)
@@ -61,14 +70,19 @@ def main():
                         subprocess.run(["zip", "-qr", entry_zip, "."])
                     components.append(entry_zip.name)
 
-        os.chdir(dist_components_dir)
+        if demos_with_error:
+            demos_for_display = "\n".join(f"  {d}" for d in demos_with_error)
+            print(f"black complained about:\n{demos_for_display}")
+            print("not creating bundle zipfile")
+        else:
+            os.chdir(dist_components_dir)
 
-        now = datetime.datetime.now(datetime.timezone.utc)
-        timestamp = now.strftime("%Y%m%dT%H%M%SZ")
-        bundle_zip = dist_dir / f"demos-{timestamp}.zip"
+            now = datetime.datetime.now(datetime.timezone.utc)
+            timestamp = now.strftime("%Y%m%dT%H%M%SZ")
+            bundle_zip = dist_dir / f"demos-{timestamp}.zip"
 
-        subprocess.run(["zip", "-0", bundle_zip] + components)
-        print(f"made {bundle_zip}")
+            subprocess.run(["zip", "-0", bundle_zip] + components)
+            print(f"made {bundle_zip}")
 
 
 if __name__ == "__main__":
