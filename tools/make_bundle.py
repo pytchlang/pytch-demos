@@ -70,14 +70,19 @@ def main():
                         subprocess.run(["zip", "-qr", entry_zip, "."])
                     components.append(entry_zip.name)
 
-        os.chdir(dist_components_dir)
+        if demos_with_error:
+            demos_for_display = "\n".join(f"  {d}" for d in demos_with_error)
+            print(f"black complained about:\n{demos_for_display}")
+            print("not creating bundle zipfile")
+        else:
+            os.chdir(dist_components_dir)
 
-        now = datetime.datetime.now(datetime.timezone.utc)
-        timestamp = now.strftime("%Y%m%dT%H%M%SZ")
-        bundle_zip = dist_dir / f"demos-{timestamp}.zip"
+            now = datetime.datetime.now(datetime.timezone.utc)
+            timestamp = now.strftime("%Y%m%dT%H%M%SZ")
+            bundle_zip = dist_dir / f"demos-{timestamp}.zip"
 
-        subprocess.run(["zip", "-0", bundle_zip] + components)
-        print(f"made {bundle_zip}")
+            subprocess.run(["zip", "-0", bundle_zip] + components)
+            print(f"made {bundle_zip}")
 
 
 if __name__ == "__main__":
