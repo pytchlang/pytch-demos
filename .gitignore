@@ -1,2 +1,5 @@
 # Build output:
 /dist/
+
+# Virtualenv for using tools:
+/tools/venv
