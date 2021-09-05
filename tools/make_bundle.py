@@ -7,7 +7,7 @@ from pathlib import Path
 from contextlib import contextmanager
 from fnmatch import fnmatch
 
-EXCLUDE_PATTERNS = ["README.md"]
+EXCLUDE_PATTERNS = ["README.md", "pyproject.toml"]
 
 
 @contextmanager
