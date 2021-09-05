@@ -20,6 +20,11 @@ def workingdir(path):
         os.chdir(cwd)
 
 
+def passes_black_check(path):
+    result = subprocess.run(["black", "--check", "--quiet", path])
+    return result.returncode == 0
+
+
 @click.command()
 def main():
     # TODO: What if pathnames are not encoded in UTF8?
