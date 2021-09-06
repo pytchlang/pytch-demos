@@ -87,10 +87,7 @@ def main():
                         demos_with_error.append(entry)
 
                     entry_zip = dist_build_content_dir / f"{entry}.zip"
-                    try:
-                        os.remove(entry_zip)
-                    except FileNotFoundError:
-                        pass
+                    ignore_FileNotFoundError(os.remove, entry_zip)
                     print(f"adding zip {entry_zip.name}")
                     with workingdir(Path(entry) / "dist"):
                         subprocess.run(["zip", "-qr", entry_zip, "."])
@@ -110,10 +107,7 @@ def main():
             print(f"made {bundle_zip}")
 
             unit_test_link_path = dist_build_basedir / "fake-build-id-for-tests"
-            try:
-                os.remove(unit_test_link_path)
-            except FileNotFoundError:
-                pass
+            ignore_FileNotFoundError(os.remove, unit_test_link_path)
             os.symlink(build_id, unit_test_link_path)
 
 
