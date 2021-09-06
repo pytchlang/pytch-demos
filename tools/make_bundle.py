@@ -30,6 +30,13 @@ def head_short_sha():
     )
 
 
+def ignore_FileNotFoundError(fun, *args, **kwargs):
+    try:
+        fun(*args, **kwargs)
+    except FileNotFoundError:
+        pass
+
+
 def passes_black_check(path):
     result = subprocess.run(["black", "--check", "--quiet", path])
     return result.returncode == 0
