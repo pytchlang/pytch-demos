@@ -102,6 +102,13 @@ def main():
             subprocess.run(["zip", "-0r", bundle_zip, build_id])
             print(f"made {bundle_zip}")
 
+            unit_test_link_path = dist_build_basedir / "fake-build-id-for-tests"
+            try:
+                os.remove(unit_test_link_path)
+            except FileNotFoundError:
+                pass
+            os.symlink(build_id, unit_test_link_path)
+
 
 if __name__ == "__main__":
     main()
