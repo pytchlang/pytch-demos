@@ -28,10 +28,10 @@ class Car(pytch.Sprite):
 
     def set_pose(self):
         # Our theta is our position on the track in DEGREES
-        th = self.direction * self.theta
+        th = self.theta_sense * self.theta
         x = self.radius * math.cos(math.pi * th / 180.0)
         y = self.radius * math.sin(math.pi * th / 180.0)
-        r = self.direction * (self.theta + 90)
+        r = self.theta_sense * (self.theta + 90)
         self.go_to_xy(x, y)
         self.point_degrees(r)
 
@@ -45,14 +45,14 @@ class Car(pytch.Sprite):
     @pytch.when_green_flag_clicked
     def create_cars(self):
         self.wanted_speed = 1.0
-        self.direction = 1
+        self.theta_sense = 1
         self.radius = 135.5
         for i in range(n_cars):
             self.next_idx = (i + 1) % n_cars
             self.theta = 360 * i / n_cars
             pytch.create_clone_of(self)
         self.radius = 155.5
-        self.direction = -1
+        self.theta_sense = -1
         self.next_costume()
         for i in range(n_cars):
             self.next_idx = n_cars + (i + 1) % n_cars
