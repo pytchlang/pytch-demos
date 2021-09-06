@@ -53,14 +53,21 @@ def main():
     )
 
     dist_dir = Path(git_root) / "dist"
-    dist_components_dir = dist_dir / "components"
-    os.makedirs(dist_components_dir, exist_ok=True)
+    dist_build_basedir = dist_dir / "components"
 
     with tempfile.TemporaryDirectory() as builddir:
         os.chdir(builddir)
         subprocess.run(["git", "clone", "--quiet", git_root])
-        print(f"cloned into {builddir}")
-        os.chdir("pytch-demos/demos")
+
+        os.chdir("pytch-demos")
+        build_id = head_short_sha()
+
+        dist_build_content_dir = dist_build_basedir / build_id
+        os.makedirs(dist_build_content_dir, exist_ok=True)
+
+        print(f"cloned into {builddir} at {build_id}")
+        os.chdir("demos")
+
         components = []
         demos_with_error = []
         for entry in os.listdir("."):
@@ -69,13 +76,13 @@ def main():
             else:
                 if os.path.isfile(entry):
                     print(f"adding file {entry}")
-                    subprocess.run(["cp", entry, dist_components_dir])
+                    subprocess.run(["cp", entry, dist_build_content_dir])
                     components.append(entry)
                 if os.path.isdir(entry):
                     if not passes_black_check(Path(entry) / "dist/code/code.py"):
                         demos_with_error.append(entry)
 
-                    entry_zip = dist_components_dir / f"{entry}.zip"
+                    entry_zip = dist_build_content_dir / f"{entry}.zip"
                     try:
                         os.remove(entry_zip)
                     except FileNotFoundError:
@@ -92,13 +99,13 @@ def main():
                 emit_black_results(Path(demo) / "dist/code/code.py")
             print("\nnot creating bundle zipfile")
         else:
-            os.chdir(dist_components_dir)
+            os.chdir(dist_build_basedir)
 
             now = datetime.datetime.now(datetime.timezone.utc)
             timestamp = now.strftime("%Y%m%dT%H%M%SZ")
             bundle_zip = dist_dir / f"demos-{timestamp}.zip"
 
-            subprocess.run(["zip", "-0", bundle_zip] + components)
+            subprocess.run(["zip", "-0r", bundle_zip, build_id])
             print(f"made {bundle_zip}")
 
 
