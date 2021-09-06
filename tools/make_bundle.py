@@ -2,7 +2,6 @@ import tempfile
 import os
 import subprocess
 import click
-import datetime
 from pathlib import Path
 from contextlib import contextmanager
 from fnmatch import fnmatch
@@ -98,9 +97,7 @@ def main():
         else:
             os.chdir(dist_build_basedir)
 
-            now = datetime.datetime.now(datetime.timezone.utc)
-            timestamp = now.strftime("%Y%m%dT%H%M%SZ")
-            bundle_zip = dist_dir / f"demos-{timestamp}.zip"
+            bundle_zip = dist_dir / f"demos-{build_id}.zip"
 
             subprocess.run(["zip", "-0r", bundle_zip, build_id])
             print(f"made {bundle_zip}")
