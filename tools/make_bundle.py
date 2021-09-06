@@ -53,7 +53,7 @@ def main():
     )
 
     dist_dir = Path(git_root) / "dist"
-    dist_build_basedir = dist_dir / "components"
+    dist_build_basedir = dist_dir / "builds"
 
     with tempfile.TemporaryDirectory() as builddir:
         os.chdir(builddir)
