@@ -25,6 +25,10 @@ def passes_black_check(path):
     return result.returncode == 0
 
 
+def emit_black_results(path):
+    subprocess.run(["black", "--diff", "--color", path])
+
+
 @click.command()
 def main():
     # TODO: What if pathnames are not encoded in UTF8?
@@ -71,9 +75,11 @@ def main():
                     components.append(entry_zip.name)
 
         if demos_with_error:
-            demos_for_display = "\n".join(f"  {d}" for d in demos_with_error)
-            print(f"black complained about:\n{demos_for_display}")
-            print("not creating bundle zipfile")
+            print("\nblack is not happy:")
+            for demo in demos_with_error:
+                print("")
+                emit_black_results(Path(demo) / "dist/code/code.py")
+            print("\nnot creating bundle zipfile")
         else:
             os.chdir(dist_components_dir)
 
