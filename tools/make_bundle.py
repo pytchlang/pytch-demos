@@ -68,7 +68,6 @@ def main():
         print(f"cloned into {builddir} at {build_id}")
         os.chdir("demos")
 
-        components = []
         demos_with_error = []
         for entry in os.listdir("."):
             if any(fnmatch(entry, pattern) for pattern in EXCLUDE_PATTERNS):
@@ -77,7 +76,6 @@ def main():
                 if os.path.isfile(entry):
                     print(f"adding file {entry}")
                     subprocess.run(["cp", entry, dist_build_content_dir])
-                    components.append(entry)
                 if os.path.isdir(entry):
                     if not passes_black_check(Path(entry) / "dist/code/code.py"):
                         demos_with_error.append(entry)
@@ -90,7 +88,6 @@ def main():
                     print(f"adding zip {entry_zip.name}")
                     with workingdir(Path(entry) / "dist"):
                         subprocess.run(["zip", "-qr", entry_zip, "."])
-                    components.append(entry_zip.name)
 
         if demos_with_error:
             print("\nblack is not happy:")
