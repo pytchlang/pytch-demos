@@ -20,6 +20,17 @@ def workingdir(path):
         os.chdir(cwd)
 
 
+def head_short_sha():
+    return (
+        subprocess.run(
+            ["git", "rev-parse", "--short=12", "HEAD"],
+            capture_output=True,
+        )
+        .stdout.decode("utf8")
+        .rstrip()
+    )
+
+
 def passes_black_check(path):
     result = subprocess.run(["black", "--check", "--quiet", path])
     return result.returncode == 0
