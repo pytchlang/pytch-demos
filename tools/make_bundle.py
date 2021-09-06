@@ -2,7 +2,6 @@ import tempfile
 import os
 import subprocess
 import click
-import datetime
 from pathlib import Path
 from contextlib import contextmanager
 from fnmatch import fnmatch
@@ -18,6 +17,24 @@ def workingdir(path):
         yield
     finally:
         os.chdir(cwd)
+
+
+def head_short_sha():
+    return (
+        subprocess.run(
+            ["git", "rev-parse", "--short=12", "HEAD"],
+            capture_output=True,
+        )
+        .stdout.decode("utf8")
+        .rstrip()
+    )
+
+
+def ignore_FileNotFoundError(fun, *args, **kwargs):
+    try:
+        fun(*args, **kwargs)
+    except FileNotFoundError:
+        pass
 
 
 def passes_black_check(path):
@@ -42,15 +59,21 @@ def main():
     )
 
     dist_dir = Path(git_root) / "dist"
-    dist_components_dir = dist_dir / "components"
-    os.makedirs(dist_components_dir, exist_ok=True)
+    dist_build_basedir = dist_dir / "builds"
 
     with tempfile.TemporaryDirectory() as builddir:
         os.chdir(builddir)
         subprocess.run(["git", "clone", "--quiet", git_root])
-        print(f"cloned into {builddir}")
-        os.chdir("pytch-demos/demos")
-        components = []
+
+        os.chdir("pytch-demos")
+        build_id = head_short_sha()
+
+        dist_build_content_dir = dist_build_basedir / build_id
+        os.makedirs(dist_build_content_dir, exist_ok=True)
+
+        print(f"cloned into {builddir} at {build_id}")
+        os.chdir("demos")
+
         demos_with_error = []
         for entry in os.listdir("."):
             if any(fnmatch(entry, pattern) for pattern in EXCLUDE_PATTERNS):
@@ -58,21 +81,16 @@ def main():
             else:
                 if os.path.isfile(entry):
                     print(f"adding file {entry}")
-                    subprocess.run(["cp", entry, dist_components_dir])
-                    components.append(entry)
+                    subprocess.run(["cp", entry, dist_build_content_dir])
                 if os.path.isdir(entry):
                     if not passes_black_check(Path(entry) / "dist/code/code.py"):
                         demos_with_error.append(entry)
 
-                    entry_zip = dist_components_dir / f"{entry}.zip"
-                    try:
-                        os.remove(entry_zip)
-                    except FileNotFoundError:
-                        pass
+                    entry_zip = dist_build_content_dir / f"{entry}.zip"
+                    ignore_FileNotFoundError(os.remove, entry_zip)
                     print(f"adding zip {entry_zip.name}")
                     with workingdir(Path(entry) / "dist"):
                         subprocess.run(["zip", "-qr", entry_zip, "."])
-                    components.append(entry_zip.name)
 
         if demos_with_error:
             print("\nblack is not happy:")
@@ -81,14 +99,16 @@ def main():
                 emit_black_results(Path(demo) / "dist/code/code.py")
             print("\nnot creating bundle zipfile")
         else:
-            os.chdir(dist_components_dir)
+            os.chdir(dist_build_basedir)
 
-            now = datetime.datetime.now(datetime.timezone.utc)
-            timestamp = now.strftime("%Y%m%dT%H%M%SZ")
-            bundle_zip = dist_dir / f"demos-{timestamp}.zip"
+            bundle_zip = dist_dir / f"demos-{build_id}.zip"
 
-            subprocess.run(["zip", "-0", bundle_zip] + components)
+            subprocess.run(["zip", "-0r", bundle_zip, build_id])
             print(f"made {bundle_zip}")
+
+            unit_test_link_path = dist_build_basedir / "fake-build-id-for-tests"
+            ignore_FileNotFoundError(os.remove, unit_test_link_path)
+            os.symlink(build_id, unit_test_link_path)
 
 
 if __name__ == "__main__":

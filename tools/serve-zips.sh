@@ -15,6 +15,6 @@ fi
 
 python3 "$TOOLS_DIR"/make_bundle.py
 
-cd "$REPO_ROOT/dist/components"
+cd "$REPO_ROOT/dist/builds"
 echo "Serving demo zips from $(pwd)"
 exec python3 "$TOOLS_DIR"/cors_server.py 8126
