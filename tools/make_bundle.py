@@ -75,9 +75,11 @@ def main():
                     components.append(entry_zip.name)
 
         if demos_with_error:
-            demos_for_display = "\n".join(f"  {d}" for d in demos_with_error)
-            print(f"black complained about:\n{demos_for_display}")
-            print("not creating bundle zipfile")
+            print("\nblack is not happy:")
+            for demo in demos_with_error:
+                print("")
+                emit_black_results(Path(demo) / "dist/code/code.py")
+            print("\nnot creating bundle zipfile")
         else:
             os.chdir(dist_components_dir)
 
