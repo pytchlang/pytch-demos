@@ -10,14 +10,6 @@ class Enemy(pytch.Sprite):
     Costumes = ["shinyorb.png"]
     Size_by_generation = [1.0, 0.7, 0.5, 0.35, 0.25]
 
-    def drift_down(self):
-        t = random.random() * 2.0 * pi
-        speed = -0.15 - 0.1 * random.random()
-        while True:
-            self.change_y(speed + 0.15 * self.size * sin(2 * t))
-            self.change_x(0.25 * self.size * cos(t))
-            t += 0.025
-
     @pytch.when_green_flag_clicked
     def init(self):
         self.generation = 0
@@ -41,6 +33,14 @@ class Enemy(pytch.Sprite):
         self.change_y(random.random() * 80 * new_size)
         self.set_size(new_size)
         self.drift_down()
+
+    def drift_down(self):
+        t = random.random() * 2.0 * pi
+        speed = -0.15 - 0.1 * random.random()
+        while True:
+            self.change_y(speed + 0.15 * self.size * sin(2 * t))
+            self.change_x(0.25 * self.size * cos(t))
+            t += 0.025
 
 
 class Sky(pytch.Stage):
