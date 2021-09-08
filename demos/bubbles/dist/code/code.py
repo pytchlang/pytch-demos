@@ -18,6 +18,8 @@ class Orb(pytch.Sprite):
 
     @pytch.when_this_sprite_clicked
     def split(self):
+        for i in range(15):
+            self.set_size(self.size * 0.8)
         self.generation += 1
         if self.generation < len(self.Size_by_generation):
             self.split_dir = -1
