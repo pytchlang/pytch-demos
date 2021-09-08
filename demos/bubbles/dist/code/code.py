@@ -30,10 +30,9 @@ class Orb(pytch.Sprite):
 
     @pytch.when_I_start_as_a_clone
     def separate_and_shrink(self):
-        new_size = self.Size_by_generation[self.generation]
-        self.change_x(self.split_dir * 80 * new_size)
-        self.change_y(random.random() * 80 * new_size)
-        self.set_size(new_size)
+        self.set_size(self.Size_by_generation[self.generation])
+        self.change_x(self.split_dir * 80 * self.size)
+        self.change_y(random.random() * 80 * self.size)
         self.drift_down()
 
     def drift_down(self):
