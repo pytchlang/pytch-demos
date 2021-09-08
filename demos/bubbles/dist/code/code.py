@@ -37,9 +37,9 @@ class Orb(pytch.Sprite):
 
     def drift_down(self):
         t = random.random() * 2.0 * pi
-        speed = -0.15 - 0.1 * random.random()
+        speed = 0.15 + 0.1 * random.random()
         while True:
-            self.change_y(speed + 0.15 * self.size * sin(2 * t))
+            self.change_y(-speed + 0.15 * self.size * sin(2 * t))
             self.change_x(0.25 * self.size * cos(t))
             t += 0.025
 
