@@ -6,17 +6,9 @@ import random
 # in Wireframe 10 (https://wireframe.raspberrypi.org/issues/10)
 
 
-class Enemy(pytch.Sprite):
+class Orb(pytch.Sprite):
     Costumes = ["shinyorb.png"]
     Size_by_generation = [1.0, 0.7, 0.5, 0.35, 0.25]
-
-    def drift_down(self):
-        t = random.random() * 2.0 * pi
-        speed = -0.15 - 0.1 * random.random()
-        while True:
-            self.change_y(speed + 0.15 * self.size * sin(2 * t))
-            self.change_x(0.25 * self.size * cos(t))
-            t += 0.025
 
     @pytch.when_green_flag_clicked
     def init(self):
@@ -26,6 +18,8 @@ class Enemy(pytch.Sprite):
 
     @pytch.when_this_sprite_clicked
     def split(self):
+        for i in range(15):
+            self.set_size(self.size * 0.8)
         self.generation += 1
         if self.generation < len(self.Size_by_generation):
             self.split_dir = -1
@@ -36,11 +30,18 @@ class Enemy(pytch.Sprite):
 
     @pytch.when_I_start_as_a_clone
     def separate_and_shrink(self):
-        new_size = self.Size_by_generation[self.generation]
-        self.change_x(self.split_dir * 80 * new_size)
-        self.change_y(random.random() * 80 * new_size)
-        self.set_size(new_size)
+        self.set_size(self.Size_by_generation[self.generation])
+        self.change_x(self.split_dir * 80 * self.size)
+        self.change_y(random.random() * 80 * self.size)
         self.drift_down()
+
+    def drift_down(self):
+        t = random.random() * 2.0 * pi
+        speed = 0.15 + 0.1 * random.random()
+        while True:
+            self.change_y(-speed + 0.15 * self.size * sin(2 * t))
+            self.change_x(0.25 * self.size * cos(t))
+            t += 0.025
 
 
 class Sky(pytch.Stage):
