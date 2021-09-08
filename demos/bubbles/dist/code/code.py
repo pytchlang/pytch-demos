@@ -6,7 +6,7 @@ import random
 # in Wireframe 10 (https://wireframe.raspberrypi.org/issues/10)
 
 
-class Enemy(pytch.Sprite):
+class Orb(pytch.Sprite):
     Costumes = ["shinyorb.png"]
     Size_by_generation = [1.0, 0.7, 0.5, 0.35, 0.25]
 
