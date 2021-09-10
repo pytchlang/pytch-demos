@@ -146,23 +146,6 @@ class Highlight(pytch.Sprite):
     Sounds = ["whoosh-slow.mp3"]
     start_shown = False
 
-    def ease_to(self, dest_x, dest_y, n_frames):
-        # TODO: Should this be made part of pytch.Sprite?
-        start_x = self._x
-        start_y = self._y
-
-        for frame_idx in range(1, n_frames + 1):
-            t0 = frame_idx / n_frames  # t is in (0.0, 1.0]
-            t = (
-                2 * t0 * t0
-                if t0 < 0.5
-                else 1 - (-2 * t0 + 2) * (-2 * t0 + 2) / 2
-            )
-            t_c = 1.0 - t  # 'complement'
-            x = t * dest_x + t_c * start_x
-            y = t * dest_y + t_c * start_y
-            self.go_to_xy(x, y)
-
     def highlight(self, position_idx, costume_tag):
         x, y = coords_of_index(position_idx)
         self.go_to_xy(x, y)
@@ -190,7 +173,7 @@ class Highlight(pytch.Sprite):
         for idx in State.route[1:]:
             self.start_sound("whoosh-slow")
             x, y = coords_of_index(idx)
-            self.ease_to(x, y, 40)
+            self.glide_to_xy(x, y, 0.6, "ease-in-out")
             pytch.wait_seconds(0.15)
 
     @pytch.when_I_receive("reset-highlights")
