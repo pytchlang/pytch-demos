@@ -190,7 +190,7 @@ class Highlight(pytch.Sprite):
         for idx in State.route[1:]:
             self.start_sound("whoosh-slow")
             x, y = coords_of_index(idx)
-            self.ease_to(x, y, 40)
+            self.glide_to_xy(x, y, 0.6, "ease-in-out")
             pytch.wait_seconds(0.15)
 
     @pytch.when_I_receive("reset-highlights")
