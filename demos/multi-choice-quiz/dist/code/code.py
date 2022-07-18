@@ -70,23 +70,15 @@ class Narrator(pytch.Sprite):
 
         self.say_for_seconds("Let's begin", 2)
 
-        question = 0
-        while question < n_questions:
-            question_info = all_questions_info[question]
-            question_text = question_info[0]
+        question_index = 0
+        while question_index < n_questions:
+            question_info = all_questions_info[question_index]
+            question = question_info[0]
             ans_A = "A: " + question_info[1]
             ans_B = "B: " + question_info[2]
             ans_C = "C: " + question_info[3]
-            speech = (
-                question_text
-                + "\n"
-                + ans_A
-                + "\n"
-                + ans_B
-                + "\n"
-                + ans_C
-            )
-            self.say(speech)
+            text = question + "\n" + ans_A + "\n" + ans_B + "\n" + ans_C
+            self.say(text)
 
             clicked = False
             while not clicked:
@@ -98,7 +90,7 @@ class Narrator(pytch.Sprite):
             else:
                 self.say_for_seconds("Sorry, that's not correct", 1)
 
-            question += 1
+            question_index += 1
 
         self.say(f"You got {score} right out of {n_questions}")
 
