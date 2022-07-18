@@ -85,10 +85,10 @@ class Narrator(pytch.Sprite):
                 pass
 
             if answer == question_info[4]:
-                self.say_for_seconds("Correct!", 1)
+                self.say_for_seconds("Correct!", 2)
                 score += 1
             else:
-                self.say_for_seconds("Sorry, that's not correct", 1)
+                self.say_for_seconds("Sorry, that's not correct", 2)
 
             question_index += 1
 
