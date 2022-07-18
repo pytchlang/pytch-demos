@@ -62,7 +62,7 @@ answer = None
 
 
 class Narrator(pytch.Sprite):
-    Costumes = ["button-exclamation.png"]
+    Costumes = ["button-question.png"]
 
     @pytch.when_green_flag_clicked
     def play_quiz(self):
