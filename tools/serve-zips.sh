@@ -5,14 +5,9 @@ REPO_ROOT="$(realpath "$TOOLS_DIR"/..)"
 
 cd "$REPO_ROOT"
 
-if [ -r "$TOOLS_DIR"/venv/bin/activate ]; then
-    source "$TOOLS_DIR"/venv/bin/activate
-else
-    cd "$TOOLS_DIR"
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install --upgrade pip
-    pip install -r requirements.txt
+n_poetry_envs=$(poetry env list | wc -l)
+if [ "$n_poetry_envs" = "0" ]; then
+    poetry install
 fi
 
 python3 "$TOOLS_DIR"/make_bundle.py
