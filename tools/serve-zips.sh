@@ -1,5 +1,25 @@
 #!/bin/bash
 
+set -e
+
+########################################################################
+
+have_all_tools=yes
+for tool in realpath poetry python zip; do
+    if ! hash "$tool" 2> /dev/null; then
+        echo Could not find "$tool"
+        have_all_tools=no
+    fi
+done
+
+if [ "$have_all_tools" = "no" ]; then
+    echo
+    echo "Required tool/s missing.  Please install it/them and try again."
+    exit 1
+fi
+
+########################################################################
+
 TOOLS_DIR="$(realpath "$(dirname "$0")")"
 REPO_ROOT="$(realpath "$TOOLS_DIR"/..)"
 
