@@ -3,10 +3,8 @@
 Set-up:
 
 ``` shell
-python -m venv venv
-source venv/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt
+# In root of repo:
+poetry install
 ```
 
 Use to create bundle:

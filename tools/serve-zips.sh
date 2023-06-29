@@ -1,20 +1,42 @@
 #!/bin/bash
 
+set -e
+
+########################################################################
+
+have_all_tools=yes
+for tool in realpath poetry python zip; do
+    if ! hash "$tool" 2> /dev/null; then
+        echo Could not find "$tool"
+        have_all_tools=no
+    fi
+done
+
+if [ "$have_all_tools" = "no" ]; then
+    echo
+    echo "Required tool/s missing.  Please install it/them and try again."
+    exit 1
+fi
+
+########################################################################
+
 TOOLS_DIR="$(realpath "$(dirname "$0")")"
 REPO_ROOT="$(realpath "$TOOLS_DIR"/..)"
 
-if [ -r "$TOOLS_DIR"/venv/bin/activate ]; then
-    source "$TOOLS_DIR"/venv/bin/activate
-else
-    cd "$TOOLS_DIR"
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install --upgrade pip
-    pip install -r requirements.txt
+cd "$REPO_ROOT"
+
+n_poetry_envs=$(poetry env list | wc -l)
+if [ "$n_poetry_envs" = "0" ]; then
+    poetry install
 fi
 
-python3 "$TOOLS_DIR"/make_bundle.py
+(
+    cd tools
+    poetry run python make_bundle.py
+)
 
-cd "$REPO_ROOT/dist/builds"
-echo "Serving demo zips from $(pwd)"
-exec python3 "$TOOLS_DIR"/cors_server.py 8126
+(
+    cd dist/builds
+    echo "Serving demo zips from $(pwd)"
+    poetry run python ../../tools/cors_server.py 8126
+)
