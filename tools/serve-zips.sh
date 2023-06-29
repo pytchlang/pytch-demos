@@ -3,6 +3,8 @@
 TOOLS_DIR="$(realpath "$(dirname "$0")")"
 REPO_ROOT="$(realpath "$TOOLS_DIR"/..)"
 
+cd "$REPO_ROOT"
+
 if [ -r "$TOOLS_DIR"/venv/bin/activate ]; then
     source "$TOOLS_DIR"/venv/bin/activate
 else
