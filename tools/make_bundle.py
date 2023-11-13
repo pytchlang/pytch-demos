@@ -110,6 +110,8 @@ def main():
                     print(f"adding file {entry}")
                     subprocess.run(["cp", entry, dist_build_content_dir])
                 if os.path.isdir(entry):
+                    was_converted = maybe_convert_to_code_json(entry)
+
                     if not passes_black_check(Path(entry) / "dist/code/code.py"):
                         demos_with_error.append(entry)
 
@@ -117,7 +119,8 @@ def main():
                     ignore_FileNotFoundError(os.remove, entry_zip)
                     print(f"adding zip {entry_zip.name}")
                     with workingdir(Path(entry) / "dist"):
-                        subprocess.run(["zip", "-qr", entry_zip, "."])
+                        extra_opts = ["-x", "code.py"] if was_converted else []
+                        subprocess.run(["zip", "-qr", entry_zip, "."] + extra_opts)
 
         if demos_with_error:
             print("\nblack is not happy:")
