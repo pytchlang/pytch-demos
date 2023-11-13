@@ -2,6 +2,7 @@ import tempfile
 import os
 import subprocess
 import click
+import json
 from pathlib import Path
 from contextlib import contextmanager
 from fnmatch import fnmatch
@@ -46,6 +47,32 @@ def emit_black_results(path):
     subprocess.run(["black", "--diff", "--color", path])
 
 
+def maybe_convert_to_code_json(entry):
+    """Return True/False according to whether a conversion took place.
+
+    Fudge: If this claims to be at least a version-3 zipfile but has a
+    code.py file, convert it to a code.json file.  Use case here is that
+    we want to have Python code in a more git-friendly representation in
+    this demos repo, but still provide a proper zipfile.  We leave the
+    code.py file in place so that black can work with it, but will
+    exclude it in the main code explicitly when making the zipfile.
+    """
+
+    version_path = Path(entry) / "dist/version.json"
+    with version_path.open("rt") as version_file:
+        version = json.load(version_file)["pytchZipfileVersion"]
+        if version >= 3:
+            code_path = Path(entry) / "dist/code/code.py"
+            if code_path.is_file():
+                code_text = code_path.read_text()
+                code_obj = {"kind": "flat", "text": code_text}
+                json_path = Path(entry) / "dist/code/code.json"
+                with json_path.open("wt") as json_file:
+                    json.dump(code_obj, json_file)
+                return True
+    return False
+
+
 @click.command()
 def main():
     # TODO: What if pathnames are not encoded in UTF8?
@@ -83,6 +110,8 @@ def main():
                     print(f"adding file {entry}")
                     subprocess.run(["cp", entry, dist_build_content_dir])
                 if os.path.isdir(entry):
+                    was_converted = maybe_convert_to_code_json(entry)
+
                     if not passes_black_check(Path(entry) / "dist/code/code.py"):
                         demos_with_error.append(entry)
 
@@ -90,7 +119,8 @@ def main():
                     ignore_FileNotFoundError(os.remove, entry_zip)
                     print(f"adding zip {entry_zip.name}")
                     with workingdir(Path(entry) / "dist"):
-                        subprocess.run(["zip", "-qr", entry_zip, "."])
+                        extra_opts = ["-x", "code.py"] if was_converted else []
+                        subprocess.run(["zip", "-qr", entry_zip, "."] + extra_opts)
 
         if demos_with_error:
             print("\nblack is not happy:")
