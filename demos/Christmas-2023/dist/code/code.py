@@ -17,14 +17,19 @@ import random
 # https://breakingcopyright.com/song/batchbug-snowflake
 # Creative Commons (CC BY 3.0) https://creativecommons.org/licenses/by/3.0
 
+
 class Reindeer(pytch.Sprite):
     Costumes = ["reindeer.png"]
 
     @pytch.when_green_flag_clicked
     def hide_me(self):
         self.go_to_xy(-180, -60)
-        self.say_for_seconds("Hi there! Press the 's' key to add some snow and the 'm' key to get a surprise!", 7.0)
+        self.say_for_seconds(
+            "Hi there! Press the 's' key to add some snow and the 'm' key to get a surprise!",
+            7.0,
+        )
         self.hide()
+
 
 class Snow(pytch.Sprite):
     Costumes = ["falling_snow.png"]
@@ -43,6 +48,7 @@ class Snow(pytch.Sprite):
                 self.change_y(-3)
             # Go back to the top of the image before scrolling down again:
             self.go_to_xy(0, 360)
+
 
 class Penguin(pytch.Sprite):
     # Costumes is a list where the element in position 0 is penguin_christmas
@@ -72,6 +78,7 @@ class Penguin(pytch.Sprite):
         else:
             # otherwise we must be using the "penguin_2024" one:
             self.say("The Pytch team wish you all a happy new year!")
+
 
 class BlueSky(pytch.Stage):
     Backdrops = ["sky-1.png", "sky-2.png"]
